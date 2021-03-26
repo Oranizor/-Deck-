@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import axios from "axios";
+import qs from 'qs'
 
 const Result=styled.div`
   margin-top: 10px;
@@ -19,11 +20,8 @@ const SubResult=styled.div`
   min-width:100px;
   margin-right: 10px;
 `
-const Reddiv=styled.div`
-  background-color: red;
-  height: 20px;
-  width: 100%;
-`
+
+
 const Input=styled.input`
   margin: 10px;
   height: 32px;
@@ -79,8 +77,11 @@ class Home extends React.Component{
             name:null,
             phoneNumber:null,
             address:null,
-        }
+        },
+        surusername:null,
+        surpassword:null,
     }
+
 
 
     componentDidMount() {
@@ -124,13 +125,14 @@ class Home extends React.Component{
         }).then(res=>{
             console.log("新增的axios,",res.data);
             //this.setState({data:res.data})
+            this.handleSubmit1()
         },res=>{
             console.log("失败",res)
         })
         this.setState({addcus:{...this.state.addcus,name:null,phoneNumber:null,address:null}})
+
+
     }
-
-
 
     handleSubmit3=()=>{
         //编辑用户
@@ -149,6 +151,7 @@ class Home extends React.Component{
         }).then(res=>{
             console.log("编辑的axios,",res.data);
             //this.setState({data:res.data})
+            this.handleSubmit1()
         },res=>{
             console.log("失败",res)
         })
@@ -167,6 +170,7 @@ class Home extends React.Component{
         }).then(res=>{
             console.log("删除的axios,",res.data);
             //this.setState({data:res.data})
+            this.handleSubmit1()
         },res=>{
             console.log("失败",res)
         })
@@ -174,12 +178,28 @@ class Home extends React.Component{
         this.setState({delcus:{...this.state.delcus,name:null,phoneNumber:null,address:null}})
     }
 
+    handleLogin=()=>{
+        axios({
+            method:'post',
+            url:'http://127.0.0.1:8000/adminsignin/',
+            headers:{
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            data:qs.stringify({
+                username:this.state.surusername,
+                password:this.state.surpassword,
+            })
+        }).then(res=>{
+            console.log("登录axios,",res.data);
+            this.handleSubmit1()
+        },res=>{
+            alert("登陆失败")
+        })
+    }
 
 
-    List=(data)=>{
-        return(
+    List=(data)=>
             <div>
-
                 {data.map((dat)=>{
                     //console.log("本次dat",dat)
                     return(
@@ -201,16 +221,14 @@ class Home extends React.Component{
                         )
                     })}
             </div>
-        )
-    }
 
-    NoList=()=>{
-        return(
+
+    NoList=()=>
             <Result>
                 尚未获取
             </Result>
-        )
-    }
+
+
 
     Show=(string)=> {
         if(this.hasbeenselected===true){
@@ -390,35 +408,30 @@ class Home extends React.Component{
                                     })
 
                                 }}>
-                                    {this.state.data===null?this.NoList():this.state.data.map((dat)=>{
-                                        return(
-                                            <option>{dat.id}</option>
-                                        )
-                                    })}}
+                                    {this.state.data===null?this.NoList():this.state.data.map((dat)=>{return(<option>{dat.id}</option>)})}
                                 </Select>
                                 <div>
-                                    姓名<Input value={this.state.editcus.name}
-                                             onChange={(e)=>{
-                                                 this.setState({editcus:{...this.state.editcus,name:e.target.value}})
-                                             }}
-                                />
+                                    姓名<Input value={this.state.editcus.name} onChange={(e)=>{this.setState({editcus:{...this.state.editcus,name:e.target.value}})}}/>
                                 </div>
                                 <div>
-                                    电话<Input value={this.state.editcus.phoneNumber}
-                                             onChange={(e)=>{
-                                                 this.setState({editcus:{...this.state.editcus,phoneNumber:e.target.value}})
-                                             }}
-                                />
+                                    电话<Input value={this.state.editcus.phoneNumber} onChange={(e)=>{this.setState({editcus:{...this.state.editcus,phoneNumber:e.target.value}})}}/>
                                 </div>
                                 <div>
-                                    地址<Input value={this.state.editcus.address}
-                                             onChange={(e)=>{
-                                                 this.setState({editcus:{...this.state.editcus,address:e.target.value}})
-                                             }}
-                                />
+                                    地址<Input value={this.state.editcus.address} onChange={(e)=>{this.setState({editcus:{...this.state.editcus,address:e.target.value}})}}/>
                                 </div>
                             </div>
 
+                        </div>
+                    </Left>
+                </Background>
+                <Background>
+                    <Left>
+                        <h2>管理员登录</h2>
+                        <button onClick={this.handleLogin}>登录</button>
+                        <button>登出</button>
+                        <div>
+                            用户名<Input onChange={(e)=>{this.setState({surusername:e.target.value})}}/>
+                            密码<Input type="password" onChange={(e)=>{this.setState({surpassword:e.target.value})}}/>
                         </div>
                     </Left>
                 </Background>
